@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Klantbeheer met eigen account — voorstel en testplan</title>
+<style>
+ :root{--bg:#f6f7f9;--vlak:#fff;--ink:#1a2129;--ink2:#4b5563;--ink3:#8a93a0;--lijn:#e3e7ec;--accent:#2b7bb9;--accent-licht:#e8f2fb;--ok:#1a7f37;--ok-licht:#e6f4ea;--let:#b3451e;--let-licht:#fdeae2;}
+ *{box-sizing:border-box;margin:0;padding:0}
+ body{font-family:-apple-system,"Segoe UI",Roboto,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:30px 16px 70px;line-height:1.55}
+ .wrap{max-width:1000px;margin:0 auto}
+ h1{font-size:25px;letter-spacing:-.3px}
+ .sub{color:var(--ink2);font-size:14px;margin-top:6px}
+ .tijd{color:var(--ink3);font-size:12px;margin-top:3px}
+ h2{font-size:17px;margin:38px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--lijn)}
+ h3{font-size:14.5px;margin:18px 0 6px}
+ p{font-size:14px;color:var(--ink2);margin:8px 0}
+ ol,ul{margin:8px 0 8px 22px} li{font-size:14px;color:var(--ink2);margin:5px 0}
+ a{color:var(--accent)} b{color:var(--ink)}
+ .kern{background:var(--accent-licht);border:1px solid #b9d5ec;border-left:4px solid var(--accent);border-radius:10px;padding:16px 18px;margin:16px 0}
+ .kern p,.kern li{color:#1c4f78}.kern b{color:#15496f}
+ .let{background:var(--let-licht);border-left:3px solid var(--let);border-radius:8px;padding:14px 16px;margin:14px 0}
+ .let p,.let li{color:#7a2e14}.let b{color:#5e2410}
+ .tabelwrap{background:var(--vlak);border:1px solid var(--lijn);border-radius:10px;overflow-x:auto;margin:12px 0}
+ table{border-collapse:collapse;width:100%;font-size:13px;min-width:640px}
+ th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);padding:11px 12px;border-bottom:1px solid var(--lijn);font-weight:600;background:#fbfcfd}
+ td{padding:10px 12px;border-bottom:1px solid var(--lijn);color:var(--ink2);vertical-align:top}
+ tr:last-child td{border-bottom:none}
+ td.k{color:var(--ink);font-weight:600}
+ td.leeg{min-width:110px;background:#fbfcfd}
+ .plaat{background:var(--vlak);border:1px solid var(--lijn);border-radius:10px;padding:14px;margin:12px 0;overflow-x:auto}
+ .plaat svg{display:block;width:100%;min-width:760px;height:auto}
+ .bijschrift{font-size:12px;color:var(--ink3);margin-top:8px;text-align:center}
+ .twee{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+ .twee .kaart{background:var(--vlak);border:1px solid var(--lijn);border-top:4px solid var(--accent);border-radius:10px;padding:14px 16px}
+ .twee .kaart.weg{border-top-color:var(--let)}
+ .twee h3{margin-top:0}
+ @media(max-width:700px){.twee{grid-template-columns:1fr}}
+ footer{margin-top:40px;color:var(--ink3);font-size:12px;border-top:1px solid var(--lijn);padding-top:16px}
+ @media print{body{background:#fff;padding:0}.plaat,.tabelwrap{break-inside:avoid}h2{break-after:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Klantbeheer met eigen account</h1>
+<div class="sub">Voorstel: hoe we bij klanten beheren zonder gedeeld adminaccount, en hoe we bewijzen dat het werkt.</div>
+<div class="tijd">Bijgewerkt door Buddy · 10 november 2026 · concept ter bespreking · test nog niet uitgevoerd</div>
+
+<div class="kern">
+<p><b>Aanleiding.</b> Een klant staat het gedeelde adminaccount niet meer toe: elke beheerder moet inloggen met zijn eigen e-mailadres.</p>
+<p><b>Voorstel.</b> Elke beheerder werkt met zijn eigen account uit onze eigen tenant. Per klant is er een groep. Wie bij een klant moet zijn, zet zijn lidmaatschap van die groep voor een paar uur aan. Daarna vervalt de toegang vanzelf.</p>
+<p><b>Gevraagd.</b> Akkoord op het model, en akkoord om het eerst bij één testklant te bewijzen (zie onderaan).</p>
+</div>
+
+<h2>Nu en straks</h2>
+<div class="tabelwrap"><table>
+<thead><tr><th></th><th>Nu: gedeeld adminaccount</th><th>Straks: eigen account + tijdelijke toegang</th></tr></thead>
+<tbody>
+<tr><td class="k">Wie heeft iets gedaan</td><td>Niet te zien: iedereen is dezelfde gebruiker</td><td>Staat met naam in het logboek van de klant</td></tr>
+<tr><td class="k">Toegang</td><td>Altijd aan, voor iedereen die het wachtwoord kent</td><td>Alleen na aanzetten, voor een paar uur, met reden en MFA</td></tr>
+<tr><td class="k">Collega vertrekt</td><td>Wachtwoord wijzigen bij elke klant</td><td>Eén account blokkeren: weg bij alle klanten</td></tr>
+<tr><td class="k">Wie mag bij welke klant</td><td>Wie het wachtwoord heeft</td><td>Per klant vastgelegd in een groep</td></tr>
+<tr><td class="k">Wachtwoord bij de klant</td><td>Ja, moet bewaard en gedeeld worden</td><td>Nee, er is geen account bij de klant</td></tr>
+</tbody></table></div>
+
+<h2>Flow 1 — een klant aansluiten (één keer per klant)</h2>
+<div class="plaat">
+<svg viewBox="0 0 960 400" role="img" aria-label="Zes stappen om een klant aan te sluiten. Vijf stappen doen wij in onze eigen tenant, één stap doet de klant.">
+ <defs><marker id="p" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4b5563"/></marker></defs>
+ <!-- banen -->
+ <rect x="6" y="10" width="948" height="210" rx="12" fill="#f3f8fd" stroke="#b9d5ec" stroke-width="1.5"/>
+ <text x="22" y="36" font-size="14" font-weight="700" fill="#15496f">Wij — in onze eigen tenant</text>
+ <rect x="6" y="240" width="948" height="150" rx="12" fill="#f4faf5" stroke="#b7dcc0" stroke-width="1.5"/>
+ <text x="22" y="266" font-size="14" font-weight="700" fill="#14592a">De klant — in zijn tenant</text>
+ <!-- stappen boven -->
+ <g font-size="12.5" text-anchor="middle" fill="#1a2129">
+  <g><rect x="24" y="70" width="134" height="110" rx="9" fill="#fff" stroke="#2b7bb9" stroke-width="2"/><circle cx="46" cy="70" r="13" fill="#2b7bb9"/><text x="46" y="75" fill="#fff" font-weight="700">1</text>
+   <text x="91" y="108" font-weight="700">Groep maken</text><text x="91" y="128" fill="#4b5563">één per klant,</text><text x="91" y="145" fill="#4b5563">vaste naam,</text><text x="91" y="162" fill="#4b5563">zonder leden</text></g>
+  <g><rect x="180" y="70" width="134" height="110" rx="9" fill="#fff" stroke="#2b7bb9" stroke-width="2"/><circle cx="202" cy="70" r="13" fill="#2b7bb9"/><text x="202" y="75" fill="#fff" font-weight="700">2</text>
+   <text x="247" y="108" font-weight="700">Regels instellen</text><text x="247" y="128" fill="#4b5563">hoe lang, MFA,</text><text x="247" y="145" fill="#4b5563">reden, wel of geen</text><text x="247" y="162" fill="#4b5563">goedkeuring</text></g>
+  <g><rect x="336" y="70" width="134" height="110" rx="9" fill="#fff" stroke="#2b7bb9" stroke-width="2"/><circle cx="358" cy="70" r="13" fill="#2b7bb9"/><text x="358" y="75" fill="#fff" font-weight="700">3</text>
+   <text x="403" y="108" font-weight="700">Beheerders kiezen</text><text x="403" y="128" fill="#4b5563">wie mag deze</text><text x="403" y="145" fill="#4b5563">groep tijdelijk</text><text x="403" y="162" fill="#4b5563">aanzetten</text></g>
+  <g><rect x="492" y="70" width="134" height="110" rx="9" fill="#fff" stroke="#2b7bb9" stroke-width="2"/><circle cx="514" cy="70" r="13" fill="#2b7bb9"/><text x="514" y="75" fill="#fff" font-weight="700">4</text>
+   <text x="559" y="108" font-weight="700">Koppeling maken</text><text x="559" y="128" fill="#4b5563">bestand met de</text><text x="559" y="145" fill="#4b5563">groep en de</text><text x="559" y="162" fill="#4b5563">rechten erin</text></g>
+  <g><rect x="804" y="70" width="134" height="110" rx="9" fill="#fff" stroke="#1a7f37" stroke-width="2.5"/><circle cx="826" cy="70" r="13" fill="#1a7f37"/><text x="826" y="75" fill="#fff" font-weight="700">6</text>
+   <text x="871" y="108" font-weight="700">Controleren</text><text x="871" y="128" fill="#4b5563">klant zichtbaar,</text><text x="871" y="145" fill="#4b5563">naam herkenbaar,</text><text x="871" y="162" fill="#4b5563">proef geslaagd</text></g>
+  <!-- stap klant -->
+  <g><rect x="648" y="285" width="134" height="90" rx="9" fill="#fff" stroke="#1a7f37" stroke-width="2"/><circle cx="670" cy="285" r="13" fill="#1a7f37"/><text x="670" y="290" fill="#fff" font-weight="700">5</text>
+   <text x="715" y="320" font-weight="700">Koppeling laden</text><text x="715" y="340" fill="#4b5563">per abonnement,</text><text x="715" y="357" fill="#4b5563">door hun beheerder</text></g>
+ </g>
+ <!-- pijlen -->
+ <g stroke="#4b5563" stroke-width="2" fill="none" marker-end="url(#p)">
+  <line x1="158" y1="125" x2="176" y2="125"/><line x1="314" y1="125" x2="332" y2="125"/><line x1="470" y1="125" x2="488" y2="125"/>
+  <path d="M626 125 H715 V268"/>
+  <path d="M782 330 H871 V184"/>
+ </g>
+ <text x="640" y="116" font-size="11.5" fill="#8a93a0">bestand naar klant</text>
+</svg>
+<div class="bijschrift">Stap 1 t/m 4 en 6 doen wij. Alleen stap 5 vraagt iets van de klant: één keer een bestand laden.</div>
+</div>
+<p>Heeft de klant ook Office 365, dan hangen we dezelfde groep aan de bestaande koppeling in Partner Center. Eén keer aanzetten geeft dan toegang tot beide.</p>
+
+<h2>Flow 2 — een beheerder gaat aan het werk (elke keer)</h2>
+<div class="plaat">
+<svg viewBox="0 0 1080 290" role="img" aria-label="De beheerder zet de groep aan met reden en MFA. Als goedkeuring nodig is keurt een collega goed. Daarna is hij voor een beperkte tijd lid, werkt bij de klant onder eigen naam, en vervalt de toegang vanzelf.">
+ <defs><marker id="q" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4b5563"/></marker></defs>
+ <g font-size="12.5" text-anchor="middle" fill="#1a2129">
+  <rect x="10" y="130" width="130" height="60" rx="30" fill="#2b7bb9"/><text x="75" y="156" fill="#fff" font-weight="700">Werk bij</text><text x="75" y="174" fill="#fff" font-weight="700">klant A</text>
+  <rect x="170" y="125" width="150" height="70" rx="9" fill="#fff" stroke="#2b7bb9" stroke-width="2"/><text x="245" y="153" font-weight="700">Groep aanzetten</text><text x="245" y="173" fill="#4b5563">reden + MFA</text>
+  <path d="M410 105 L470 160 L410 215 L350 160 z" fill="#fff8e1" stroke="#8a6d00" stroke-width="2"/><text x="410" y="156" font-weight="700">Goedkeuring</text><text x="410" y="173" font-weight="700">nodig?</text>
+  <rect x="490" y="20" width="150" height="56" rx="9" fill="#fff" stroke="#8a6d00" stroke-width="2"/><text x="565" y="44" font-weight="700">Collega keurt goed</text><text x="565" y="62" fill="#4b5563">of wijst af</text>
+  <rect x="520" y="125" width="150" height="70" rx="9" fill="#fff" stroke="#2b7bb9" stroke-width="2"/><text x="595" y="153" font-weight="700">Tijdelijk lid</text><text x="595" y="173" fill="#4b5563">bijv. 4 uur, max. 8</text>
+  <rect x="700" y="125" width="170" height="70" rx="9" fill="#fff" stroke="#1a7f37" stroke-width="2.5"/><text x="785" y="153" font-weight="700">Werken bij de klant</text><text x="785" y="173" fill="#4b5563">eigen naam in logboek</text>
+  <rect x="905" y="130" width="165" height="60" rx="30" fill="#1a7f37"/><text x="987" y="156" fill="#fff" font-weight="700">Tijd om:</text><text x="987" y="174" fill="#fff" font-weight="700">toegang vervalt</text>
+  <text x="398" y="92" font-size="12" fill="#8a6d00" font-weight="700">ja</text>
+  <text x="494" y="146" font-size="12" fill="#8a6d00" font-weight="700">nee</text>
+  <text x="595" y="250" font-size="12" fill="#8a93a0">Elke keer vastgelegd bij ons: wie, wanneer, hoe lang en waarom.</text>
+ </g>
+ <g stroke="#4b5563" stroke-width="2" fill="none" marker-end="url(#q)">
+  <line x1="140" y1="160" x2="166" y2="160"/><line x1="320" y1="160" x2="346" y2="160"/>
+  <line x1="470" y1="160" x2="516" y2="160"/>
+  <path d="M410 105 V48 H486"/>
+  <path d="M595 76 V121"/>
+  <line x1="670" y1="160" x2="696" y2="160"/><line x1="870" y1="160" x2="901" y2="160"/>
+ </g>
+</svg>
+</div>
+
+<h2>Flow 3 — een collega komt of gaat</h2>
+<div class="twee">
+<div class="kaart"><h3>Collega komt erbij</h3><ol><li>Krijgt een eigen account in onze tenant, met MFA en de juiste licentie.</li><li>Wordt bij de groepen van zijn klanten toegevoegd als "mag tijdelijk aanzetten".</li><li>Bij de klant hoeft niets te gebeuren.</li></ol></div>
+<div class="kaart weg"><h3>Collega vertrekt</h3><ol><li>Zijn account in onze tenant wordt geblokkeerd.</li><li>Daarmee is de toegang tot alle klanten in één keer weg.</li><li>Bij de klant hoeft niets te gebeuren en er is geen wachtwoord om te wijzigen.</li></ol></div>
+</div>
+
+<h2>Wat het vraagt</h2>
+<div class="tabelwrap"><table>
+<thead><tr><th>Onderwerp</th><th>Wat nodig is</th></tr></thead>
+<tbody>
+<tr><td class="k">Licentie</td><td>Entra ID P2 voor elke beheerder, in onze eigen tenant. De prijs moet nog worden nagevraagd. De klant heeft niets extra nodig.</td></tr>
+<tr><td class="k">Eenmalig werk</td><td>Per klant: een groep, de regels, en één bestand dat de klant laadt per Azure-abonnement.</td></tr>
+<tr><td class="k">Voor de beheerder</td><td>Eén extra handeling vóór het werk: de groep aanzetten met een reden.</td></tr>
+<tr><td class="k">Beperking</td><td>In Azure geeft deze weg geen eigenaarsrol (Owner). Voor gewoon beheer is dat niet nodig; waar het wel moet, lossen we het per klant apart op.</td></tr>
+</tbody></table></div>
+
+<h2>Besluiten die we vragen</h2>
+<ol>
+<li><b>Akkoord op het model:</b> eigen account, groep per klant, tijdelijke toegang.</li>
+<li><b>Licenties:</b> Entra ID P2 voor de beheerders.</li>
+<li><b>Goedkeuring:</b> mag een beheerder zelf aanzetten, of moet een collega goedkeuren? Voorstel: zelf aanzetten bij gewoon beheer.</li>
+<li><b>Duur:</b> hoe lang blijft toegang aan? Voorstel: 4 uur.</li>
+<li><b>Eerst bewijzen:</b> akkoord op de test hieronder bij één testklant, vóór we klanten omzetten.</li>
+</ol>
+
+<h2>Testplan — bewijzen bij één testklant</h2>
+<p>Doel: aantonen dat het model doet wat hierboven staat. Nodig: de testtenant met één Azure-abonnement, twee beheerders bij ons (A staat in de groep, B niet), en voor beiden een P2-licentie. Voor de test zetten we de duur op 30 minuten, zodat we het verlopen kunnen zien.</p>
+<div class="tabelwrap"><table>
+<thead><tr><th>Nr</th><th>Wat we doen</th><th>Wat we verwachten</th><th>Bewijs</th><th>Uitkomst</th></tr></thead>
+<tbody>
+<tr><td class="k">T1</td><td>A probeert bij de klant een resourcegroep te maken, zónder de groep aan te zetten</td><td>Lukt niet; klant is niet zichtbaar of de actie wordt geweigerd</td><td>Schermafdruk van de weigering</td><td class="leeg"></td></tr>
+<tr><td class="k">T2</td><td>A zet de groep aan, met reden en MFA</td><td>Aanzetten lukt; tijdstip noteren</td><td>Schermafdruk van de bevestiging</td><td class="leeg"></td></tr>
+<tr><td class="k">T3</td><td>A maakt bij de klant de resourcegroep <b>rg-lighthouse-test</b></td><td>Lukt. Noteer hoeveel minuten na T2 het werkte</td><td>Schermafdruk + aantal minuten</td><td class="leeg"></td></tr>
+<tr><td class="k">T4</td><td>In de tenant van de klant het activiteitenlogboek openen</td><td>De actie staat op naam van A, met zijn eigen e-mailadres</td><td>Schermafdruk van de logregel</td><td class="leeg"></td></tr>
+<tr><td class="k">T5</td><td>In onze tenant het logboek van PIM openen</td><td>Aanzetten door A staat erin, met tijd en reden</td><td>Schermafdruk van de logregel</td><td class="leeg"></td></tr>
+<tr><td class="k">T6</td><td>B (niet in de groep) probeert hetzelfde als T3</td><td>Lukt niet; B kan de groep ook niet aanzetten</td><td>Schermafdruk</td><td class="leeg"></td></tr>
+<tr><td class="k">T7</td><td>Na 30 minuten probeert A opnieuw een resourcegroep te maken</td><td>Lukt niet meer. Noteer hoeveel minuten na afloop het stopte</td><td>Schermafdruk + aantal minuten</td><td class="leeg"></td></tr>
+<tr><td class="k">T8</td><td>A wordt uit "mag aanzetten" gehaald en probeert opnieuw aan te zetten</td><td>Aanzetten is niet meer mogelijk</td><td>Schermafdruk</td><td class="leeg"></td></tr>
+<tr><td class="k">T9</td><td>Alleen als de testklant Office 365 heeft: zelfde groep aan Partner Center hangen, A zet aan en opent het beheercentrum van de klant</td><td>A komt erin met zijn eigen account</td><td>Schermafdruk</td><td class="leeg"></td></tr>
+<tr><td class="k">T10</td><td>Opruimen: rg-lighthouse-test verwijderen, duur terugzetten</td><td>Testomgeving is weer schoon</td><td>—</td><td class="leeg"></td></tr>
+</tbody></table></div>
+<p><b>Geslaagd</b> als T1 t/m T8 uitkomen zoals verwacht. T3 en T7 leveren ook de twee getallen die we nu nog niet kennen: hoe snel toegang ingaat en hoe snel hij stopt.</p>
+
+<div class="let">
+<p><b>Eerlijk over de stand:</b> dit model is opgezet volgens de documentatie van Microsoft, maar nog niet in een echte omgeving gezien. Tot de test is uitgevoerd, is het een voorstel en geen bewezen werkwijze.</p>
+</div>
+
+<p>De stappen met alle klikken staan in <a href="lighthouse-pim-groep-werkwijze.html">Lighthouse met PIM op een groep — werkwijze</a>.</p>
+
+<footer>Bijgehouden door Buddy · 10 november 2026</footer>
+</div>
+</body>
+</html>
