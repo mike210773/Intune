@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lighthouse met PIM-groep — technische procedure A tot Z</title>
+<style>
+ :root{--bg:#f6f7f9;--vlak:#fff;--ink:#1a2129;--ink2:#4b5563;--ink3:#8a93a0;--lijn:#e3e7ec;--accent:#2b7bb9;--accent-licht:#e8f2fb;--ok:#1a7f37;--ok-licht:#e6f4ea;--let:#b3451e;--let-licht:#fdeae2;}
+ *{box-sizing:border-box;margin:0;padding:0}
+ body{font-family:-apple-system,"Segoe UI",Roboto,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:30px 16px 70px;line-height:1.55}
+ .wrap{max-width:1000px;margin:0 auto}
+ h1{font-size:25px;letter-spacing:-.3px}
+ .sub{color:var(--ink2);font-size:14px;margin-top:6px}
+ .tijd{color:var(--ink3);font-size:12px;margin-top:3px}
+ h2{font-size:17px;margin:40px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--lijn)}
+ h3{font-size:14.5px;margin:0 0 6px}
+ p{font-size:14px;color:var(--ink2);margin:8px 0}
+ ol,ul{margin:8px 0 8px 22px} li{font-size:14px;color:var(--ink2);margin:5px 0}
+ a{color:var(--accent)} b{color:var(--ink)}
+ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;background:#eef1f4;padding:1px 6px;border-radius:4px;overflow-wrap:anywhere}
+ pre{background:#1e2530;color:#e6edf3;padding:14px 16px;border-radius:9px;overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.65;margin:10px 0}
+ pre .h{color:#ffd479} pre .c{color:#8b98a8}
+ .kern{background:var(--accent-licht);border:1px solid #b9d5ec;border-left:4px solid var(--accent);border-radius:10px;padding:16px 18px;margin:16px 0}
+ .kern p,.kern li{color:#1c4f78}.kern b{color:#15496f}
+ .let{background:var(--let-licht);border-left:3px solid var(--let);border-radius:8px;padding:12px 16px;margin:12px 0}
+ .let p,.let li{color:#7a2e14}.let b{color:#5e2410}
+ .goed{background:var(--ok-licht);border-left:3px solid var(--ok);border-radius:8px;padding:10px 16px;margin:10px 0}
+ .goed p{color:#14592a}.goed b{color:#0f4520}
+ .tabelwrap{background:var(--vlak);border:1px solid var(--lijn);border-radius:10px;overflow-x:auto;margin:12px 0}
+ table{border-collapse:collapse;width:100%;font-size:13px;min-width:620px}
+ th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);padding:11px 12px;border-bottom:1px solid var(--lijn);font-weight:600;background:#fbfcfd}
+ td{padding:10px 12px;border-bottom:1px solid var(--lijn);color:var(--ink2);vertical-align:top}
+ tr:last-child td{border-bottom:none}
+ td.k{color:var(--ink);font-weight:600}
+ td.leeg{min-width:150px;background:#fbfcfd}
+ .inhoudsopgave{background:var(--vlak);border:1px solid var(--lijn);border-radius:10px;padding:12px 18px;margin:16px 0;columns:2;column-gap:28px}
+ .inhoudsopgave a{display:block;font-size:13.5px;text-decoration:none;padding:3px 0}
+ @media(max-width:700px){.inhoudsopgave{columns:1}}
+ .stap{display:grid;grid-template-columns:52px 1fr;gap:12px;margin:20px 0}
+ .nr{width:52px;height:40px;border-radius:8px;background:var(--accent);color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center}
+ .nr.klant{background:var(--ok)}
+ .stap .inhoud{min-width:0}
+ .waar{font-size:12px;color:var(--ink3);margin:2px 0 8px}
+ .veldlijst{background:var(--vlak);border:1px solid var(--lijn);border-radius:9px;margin:8px 0;max-width:680px}
+ .veld{display:flex;flex-wrap:wrap;gap:4px 12px;padding:8px 14px;border-bottom:1px dashed var(--lijn);font-size:13px}
+ .veld:last-child{border-bottom:none}
+ .veld .naam{flex:0 0 220px;color:var(--ink3)}
+ .veld .waarde{flex:1 1 220px;color:var(--ink);font-weight:600;min-width:0;overflow-wrap:anywhere}
+ .veld .waarde small{font-weight:400;color:var(--ink3);font-size:12px}
+ @media(max-width:700px){.veld .naam{flex-basis:100%}.stap{grid-template-columns:44px 1fr}.nr{width:44px;font-size:13px}}
+ footer{margin-top:40px;color:var(--ink3);font-size:12px;border-top:1px solid var(--lijn);padding-top:16px}
+ @media print{body{background:#fff;padding:0}.stap,.tabelwrap,pre{break-inside:avoid}h2{break-after:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Lighthouse met PIM-groep — technische procedure</h1>
+<div class="sub">Van A tot Z: één klant aansluiten zodat beheerders met hun eigen account en tijdelijke toegang in de Azure-omgeving van de klant werken.</div>
+<div class="tijd">Bijgewerkt door Buddy · 10 november 2026 · eerste versie · opgesteld uit de documentatie van Microsoft, nog niet in een echte tenant uitgevoerd</div>
+
+<div class="kern">
+<p><b>Hoe het werkt, in drie regels.</b></p>
+<ol>
+<li>In onze tenant staat per klant een lege beveiligingsgroep. Beheerders mogen hun lidmaatschap tijdelijk aanzetten (PIM).</li>
+<li>Bij de klant krijgt die groep via Lighthouse een <b>vaste</b> rol op het abonnement.</li>
+<li>Wie de groep aanzet, heeft dus tijdelijk die rol bij de klant, onder zijn eigen naam.</li>
+</ol>
+</div>
+
+<div class="inhoudsopgave">
+<a href="#nodig">0 · Wat je nodig hebt</a>
+<a href="#gegevens">1 · Gegevens verzamelen</a>
+<a href="#a">A · Groep en PIM in onze tenant</a>
+<a href="#b">B · Het sjabloon klaarmaken</a>
+<a href="#c">C · Uitrollen bij de klant</a>
+<a href="#d">D · Controleren vanuit onze kant</a>
+<a href="#e">E · Testen en bewijs vastleggen</a>
+<a href="#f">F · Beheer daarna</a>
+<a href="#g">G · Als het niet werkt</a>
+<a href="#bronnen">Bronnen</a>
+</div>
+
+<h2 id="nodig">0 · Wat je nodig hebt</h2>
+<div class="tabelwrap"><table>
+<thead><tr><th>Waar</th><th>Wat</th><th>Waarom</th></tr></thead>
+<tbody>
+<tr><td class="k">Onze tenant</td><td>Entra ID P2 (of Entra ID Governance) voor elke beheerder die de groep mag aanzetten</td><td>Zonder die licentie werkt PIM voor groepen niet</td></tr>
+<tr><td class="k">Onze tenant</td><td>Een account met de rol Privileged Role Administrator (of Global Administrator)</td><td>Om de groep te maken en onder PIM te zetten</td></tr>
+<tr><td class="k">Onze tenant</td><td>MFA voor alle beheerders</td><td>Wordt gevraagd bij het aanzetten</td></tr>
+<tr><td class="k">Klant</td><td>Een gewoon account in de tenant van de klant (<b>geen gast</b>) met de rol Owner op het abonnement</td><td>Alleen zo'n account mag de koppeling aanmaken</td></tr>
+<tr><td class="k">Bestanden</td><td><code>sjabloon/lighthouse-subscription.json</code> en <code>sjabloon/klant.parameters.voorbeeld.json</code> uit deze repo</td><td>Het sjabloon is het officiële voorbeeld van Microsoft, ongewijzigd</td></tr>
+</tbody></table></div>
+
+<h2 id="gegevens">1 · Gegevens verzamelen</h2>
+<p>Vul dit per klant in voordat je begint. Alles wat je later moet plakken staat dan bij elkaar.</p>
+<div class="tabelwrap"><table>
+<thead><tr><th>Gegeven</th><th>Waar je het vindt</th><th>Waarde</th></tr></thead>
+<tbody>
+<tr><td class="k">Tenant-ID van ons</td><td>Entra-beheercentrum → Overzicht → Tenant-ID</td><td class="leeg"></td></tr>
+<tr><td class="k">Naam van de klant</td><td>Vaste korte schrijfwijze, zonder spaties</td><td class="leeg"></td></tr>
+<tr><td class="k">Tenant-ID van de klant</td><td>Bij de klant: Entra-beheercentrum → Overzicht</td><td class="leeg"></td></tr>
+<tr><td class="k">Abonnement-ID('s) van de klant</td><td>Bij de klant: Azure-portal → Abonnementen</td><td class="leeg"></td></tr>
+<tr><td class="k">Object-ID van de klantgroep</td><td>Komt uit stap A5</td><td class="leeg"></td></tr>
+</tbody></table></div>
+
+<h2 id="a">A · Groep en PIM in onze tenant</h2>
+
+<div class="stap"><div class="nr">A1</div><div class="inhoud">
+<h3>Maak de beveiligingsgroep</h3>
+<div class="waar">entra.microsoft.com → Groepen → Alle groepen → Nieuwe groep</div>
+<div class="veldlijst">
+<div class="veld"><span class="naam">Groepstype</span><span class="waarde">Beveiliging <small>(geen Microsoft 365-groep: die werkt niet met Lighthouse)</small></span></div>
+<div class="veld"><span class="naam">Groepsnaam</span><span class="waarde">LH-&lt;Klant&gt;-Beheer</span></div>
+<div class="veld"><span class="naam">Beschrijving</span><span class="waarde">Tijdelijke toegang Azure &lt;Klant&gt; via Lighthouse</span></div>
+<div class="veld"><span class="naam">Microsoft Entra-rollen kunnen worden toegewezen aan de groep</span><span class="waarde">Ja <small>(zie uitleg hieronder)</small></span></div>
+<div class="veld"><span class="naam">Lidmaatschapstype</span><span class="waarde">Toegewezen</span></div>
+<div class="veld"><span class="naam">Eigenaren en leden</span><span class="waarde">Leeg laten</span></div>
+</div>
+<p><b>Waarom "Ja" bij rollen toewijzen:</b> dan mogen alleen een Global Administrator, een Privileged Role Administrator of de eigenaar van de groep de leden wijzigen. Bij "Nee" kan elke helpdeskbeheerder iemand vast lid maken en daarmee PIM omzeilen. Deze keuze kun je later niet meer veranderen. Microsoft staat een beperkt aantal van zulke groepen per tenant toe (ik heb 500 in gedachten, niet nagekeken); bij heel veel klanten kies je daarom groepen per team.</p>
+</div></div>
+
+<div class="stap"><div class="nr">A2</div><div class="inhoud">
+<h3>Zet de groep onder PIM</h3>
+<div class="waar">entra.microsoft.com → ID Governance → Privileged Identity Management → Groepen</div>
+<ol>
+<li>Klik bovenaan op <b>Groepen detecteren</b>.</li>
+<li>Zoek <code>LH-&lt;Klant&gt;-Beheer</code> en vink hem aan.</li>
+<li>Klik op <b>Groepen beheren</b> en bevestig met OK.</li>
+</ol>
+<div class="goed"><p><b>Controle:</b> de groep staat nu in de lijst onder PIM → Groepen.</p></div>
+</div></div>
+
+<div class="stap"><div class="nr">A3</div><div class="inhoud">
+<h3>Stel de regels voor aanzetten in</h3>
+<div class="waar">PIM → Groepen → LH-&lt;Klant&gt;-Beheer → Instellingen → Lid → Bewerken</div>
+<div class="veldlijst">
+<div class="veld"><span class="naam">Maximale duur van activering</span><span class="waarde">4 uur <small>(voor de test: 0,5 uur)</small></span></div>
+<div class="veld"><span class="naam">Bij activering vereisen</span><span class="waarde">Azure MFA</span></div>
+<div class="veld"><span class="naam">Reden vereisen bij activering</span><span class="waarde">Aan</span></div>
+<div class="veld"><span class="naam">Ticketgegevens vereisen</span><span class="waarde">Naar keuze <small>(handig als je met ticketnummers werkt)</small></span></div>
+<div class="veld"><span class="naam">Goedkeuring vereisen</span><span class="waarde">Uit <small>(of Aan, met minstens twee goedkeurders)</small></span></div>
+<div class="veld"><span class="naam">Tabblad Toewijzing: permanente in aanmerking komende toewijzing toestaan</span><span class="waarde">Aan</span></div>
+<div class="veld"><span class="naam">Tabblad Toewijzing: permanente actieve toewijzing toestaan</span><span class="waarde">Uit</span></div>
+</div>
+<p>Klik op <b>Bijwerken</b>. Met "permanente actieve toewijzing: Uit" kan niemand per ongeluk vast lid worden.</p>
+</div></div>
+
+<div class="stap"><div class="nr">A4</div><div class="inhoud">
+<h3>Wijs de beheerders aan die mogen aanzetten</h3>
+<div class="waar">PIM → Groepen → LH-&lt;Klant&gt;-Beheer → Toewijzingen → Toewijzingen toevoegen</div>
+<div class="veldlijst">
+<div class="veld"><span class="naam">Rol selecteren</span><span class="waarde">Lid</span></div>
+<div class="veld"><span class="naam">Leden selecteren</span><span class="waarde">De beheerders van deze klant, elk met hun eigen account <small>(personen, geen groepen)</small></span></div>
+<div class="veld"><span class="naam">Type toewijzing</span><span class="waarde">In aanmerking komend</span></div>
+<div class="veld"><span class="naam">Duur</span><span class="waarde">Permanent in aanmerking komend</span></div>
+</div>
+<p>Klik op <b>Toewijzen</b>.</p>
+<div class="goed"><p><b>Controle:</b> de beheerders staan op het tabblad "In aanmerking komende toewijzingen". Het tabblad "Actieve toewijzingen" is leeg, en de groep zelf heeft nog steeds nul leden.</p></div>
+</div></div>
+
+<div class="stap"><div class="nr">A5</div><div class="inhoud">
+<h3>Kopieer het object-ID van de groep</h3>
+<div class="waar">entra.microsoft.com → Groepen → LH-&lt;Klant&gt;-Beheer → Overzicht → Object-ID</div>
+<p>Zet het in de tabel van hoofdstuk 1.</p>
+</div></div>
+
+<h2 id="b">B · Het sjabloon klaarmaken</h2>
+
+<div class="stap"><div class="nr">B1</div><div class="inhoud">
+<h3>Maak een parameterbestand voor deze klant</h3>
+<p>Kopieer <code>sjabloon/klant.parameters.voorbeeld.json</code> naar <code>&lt;klant&gt;.parameters.json</code> en vul de vier geel gemarkeerde plekken in. Het sjabloon zelf (<code>lighthouse-subscription.json</code>) verander je niet.</p>
+<pre>"mspOfferName":        { "value": "Softtech beheer - <span class="h">KLANTNAAM</span>" },
+"mspOfferDescription": { "value": "Azure-beheer door Softtech met persoonlijke accounts en tijdelijke toegang" },
+"managedByTenantId":   { "value": "<span class="h">TENANT-ID VAN ONS</span>" },
+"authorizations": { "value": [
+  {
+    "principalId": "<span class="h">OBJECT-ID VAN DE KLANTGROEP</span>",
+    "principalIdDisplayName": "LH-<span class="h">KLANTNAAM</span>-Beheer",
+    "roleDefinitionId": "b24988ac-6180-42a0-ab88-20f7382dd24c"   <span class="c">← Contributor</span>
+  },
+  {
+    "principalId": "<span class="h">OBJECT-ID VAN DE KLANTGROEP</span>",
+    "principalIdDisplayName": "LH-<span class="h">KLANTNAAM</span>-Beheer",
+    "roleDefinitionId": "91c1777a-f3dc-4fae-b103-61d183457e46"   <span class="c">← mag de koppeling zelf verwijderen</span>
+  }
+] }</pre>
+<ul>
+<li><b>De naam bij mspOfferName is belangrijk.</b> Rol je later opnieuw uit met exact dezelfde naam, dan wordt de bestaande koppeling bijgewerkt. Met een andere naam ontstaat er een tweede koppeling naast de eerste.</li>
+<li>De tweede rol raadt Microsoft aan: zonder die rol kan alleen de klant de koppeling weghalen.</li>
+<li>Er staat <b>geen</b> blok <code>eligibleAuthorizations</code> in. Het tijdelijke zit in de groep.</li>
+<li>Andere rol nodig dan Contributor? Vervang de code. Owner kan niet; rollen die bij de inhoud van data mogen ook niet.</li>
+</ul>
+</div></div>
+
+<h2 id="c">C · Uitrollen bij de klant</h2>
+<p>Dit doet de beheerder van de klant, of jij met een gewoon account in de tenant van de klant dat Owner is op het abonnement. Herhaal het voor elk abonnement.</p>
+
+<div class="stap"><div class="nr klant">C1</div><div class="inhoud">
+<h3>Via de portal</h3>
+<div class="waar">portal.azure.com (aangemeld in de tenant van de klant) → zoek "Een aangepaste sjabloon implementeren"</div>
+<ol>
+<li>Klik op <b>Bouw uw eigen sjabloon in de editor</b>.</li>
+<li>Klik op <b>Bestand laden</b>, kies <code>lighthouse-subscription.json</code>, klik op <b>Opslaan</b>.</li>
+<li>Kies bij <b>Abonnement</b> het abonnement dat je wilt koppelen en bij <b>Regio</b> West Europe.</li>
+<li>Klik op <b>Parameters bewerken</b> → <b>Bestand laden</b> → kies <code>&lt;klant&gt;.parameters.json</code> → <b>Opslaan</b>.</li>
+<li>Klik op <b>Beoordelen en maken</b> en daarna op <b>Maken</b>.</li>
+</ol>
+<div class="goed"><p><b>Controle:</b> de implementatie eindigt met "Uw implementatie is voltooid".</p></div>
+</div></div>
+
+<div class="stap"><div class="nr klant">C1b</div><div class="inhoud">
+<h3>Of via PowerShell</h3>
+<pre><span class="c"># aanmelden in de tenant van de klant</span>
+Connect-AzAccount -Tenant "<span class="h">TENANT-ID VAN DE KLANT</span>"
+Set-AzContext -Subscription "<span class="h">ABONNEMENT-ID</span>"
+
+<span class="c"># uitrollen op abonnementsniveau</span>
+New-AzSubscriptionDeployment -Name "Lighthouse-Softtech" `
+  -Location "westeurope" `
+  -TemplateFile ".\lighthouse-subscription.json" `
+  -TemplateParameterFile ".\<span class="h">klant</span>.parameters.json" `
+  -Verbose</pre>
+<p>Voor een tweede abonnement: <code>Set-AzContext</code> naar dat abonnement en hetzelfde commando nog een keer.</p>
+</div></div>
+
+<div class="stap"><div class="nr klant">C2</div><div class="inhoud">
+<h3>Controleer aan de kant van de klant</h3>
+<div class="waar">portal.azure.com (klant) → zoek "Serviceproviders" → Aanbiedingen van serviceproviders</div>
+<p>"Softtech beheer - &lt;Klant&gt;" staat in de lijst. Onder <b>Delegaties</b> staat het abonnement, met de groep en de twee rollen.</p>
+<p>Met PowerShell:</p>
+<pre>Get-AzManagedServicesDefinition
+Get-AzManagedServicesAssignment</pre>
+</div></div>
+
+<h2 id="d">D · Controleren vanuit onze kant</h2>
+
+<div class="stap"><div class="nr">D1</div><div class="inhoud">
+<h3>Zet de groep aan</h3>
+<div class="waar">entra.microsoft.com → ID Governance → Privileged Identity Management → Mijn rollen → Groepen</div>
+<ol>
+<li>Zoek <code>LH-&lt;Klant&gt;-Beheer</code> en klik op <b>Activeren</b>.</li>
+<li>Kies de duur, vul de reden in en bevestig MFA als erom wordt gevraagd.</li>
+<li>Wacht tot de status "Geactiveerd" is.</li>
+</ol>
+</div></div>
+
+<div class="stap"><div class="nr">D2</div><div class="inhoud">
+<h3>Meld je opnieuw aan en zet het filter goed</h3>
+<ol>
+<li>Meld je af bij portal.azure.com en weer aan, zodat je nieuwe lidmaatschap wordt opgepikt.</li>
+<li>Klik rechtsboven op het tandwiel → <b>Mappen en abonnementen</b>.</li>
+<li>Zorg dat bij het abonnementenfilter ook de abonnementen van de klant aangevinkt staan. Staat het filter alleen op onze eigen abonnementen, dan zie je de klant nergens.</li>
+</ol>
+</div></div>
+
+<div class="stap"><div class="nr">D3</div><div class="inhoud">
+<h3>Kijk bij Mijn klanten</h3>
+<div class="waar">portal.azure.com → zoek "Mijn klanten"</div>
+<p>De klant staat onder <b>Klanten</b>, en het abonnement onder <b>Delegaties</b>. Klik erop: je werkt nu in het abonnement van de klant, met je eigen account.</p>
+</div></div>
+
+<div class="stap"><div class="nr">D4</div><div class="inhoud">
+<h3>Maak het abonnement herkenbaar</h3>
+<p>Laat de klant het abonnement hernoemen naar <code>&lt;Klant&gt; - &lt;oude naam&gt;</code> (Abonnementen → het abonnement → Naam wijzigen). Alleen de weergavenaam verandert; het ID blijft gelijk.</p>
+</div></div>
+
+<h2 id="e">E · Testen en bewijs vastleggen</h2>
+<p>Voer de tests T1 t/m T10 uit en bewaar de schermafdrukken. Ze staan in <a href="lighthouse-pim-voorstel-en-testplan.html">Voorstel en testplan</a>. Kort:</p>
+<ol>
+<li>Zonder aanzetten: geen toegang.</li>
+<li>Na aanzetten: resourcegroep <code>rg-lighthouse-test</code> maken lukt. Noteer na hoeveel minuten.</li>
+<li>Logboek van de klant (Abonnement → Activiteitenlogboek): de actie staat op naam van de beheerder.</li>
+<li>Logboek bij ons (PIM → Groepen → de groep → Resourcecontrole): het aanzetten staat erin met tijd en reden.</li>
+<li>Collega buiten de groep: geen toegang.</li>
+<li>Na afloop van de tijd: geen toegang meer. Noteer na hoeveel minuten.</li>
+</ol>
+
+<h2 id="f">F · Beheer daarna</h2>
+<div class="tabelwrap"><table>
+<thead><tr><th>Situatie</th><th>Wat je doet</th><th>Bij de klant nodig?</th></tr></thead>
+<tbody>
+<tr><td class="k">Collega mag erbij</td><td>Stap A4: toevoegen als "in aanmerking komend"</td><td>Nee</td></tr>
+<tr><td class="k">Collega mag er niet meer bij</td><td>PIM → de groep → Toewijzingen → de persoon → Verwijderen</td><td>Nee</td></tr>
+<tr><td class="k">Collega vertrekt</td><td>Zijn account bij ons blokkeren; daarmee is alles weg</td><td>Nee</td></tr>
+<tr><td class="k">Duur of goedkeuring wijzigen</td><td>Stap A3 opnieuw</td><td>Nee</td></tr>
+<tr><td class="k">Andere of extra rol</td><td>Parameterbestand aanpassen, <b>zelfde mspOfferName</b>, hoofdstuk C opnieuw</td><td>Ja, opnieuw uitrollen</td></tr>
+<tr><td class="k">Extra abonnement</td><td>Hoofdstuk C voor dat abonnement, met hetzelfde parameterbestand</td><td>Ja</td></tr>
+<tr><td class="k">Koppeling weghalen</td><td>Wij: Mijn klanten → Delegaties → de delegatie → prullenbak (groep moet aan staan). Of de klant: Serviceproviders → Delegaties → prullenbak</td><td>Naar keuze</td></tr>
+</tbody></table></div>
+
+<h3 style="margin-top:22px">De koppeling die je vandaag al maakte, omzetten</h3>
+<ol>
+<li>Rol de nieuwe koppeling uit volgens hoofdstuk C. Die komt naast de bestaande te staan.</li>
+<li>Controleer met hoofdstuk D dat de nieuwe werkt.</li>
+<li>Laat pas daarna de oude weghalen: bij de klant onder Serviceproviders → Delegaties, de oude aanbieding → prullenbak.</li>
+</ol>
+<p>Zo is er geen moment waarop je er niet meer bij kunt.</p>
+
+<h2 id="g">G · Als het niet werkt</h2>
+<div class="tabelwrap"><table>
+<thead><tr><th>Wat je ziet</th><th>Waarschijnlijke oorzaak</th><th>Oplossing</th></tr></thead>
+<tbody>
+<tr><td class="k">Uitrollen mislukt met een melding over autorisatie of roleAssignments</td><td>Het account is een gast, of geen Owner op het abonnement</td><td>Uitrollen met een gewoon account van de klant dat Owner is</td></tr>
+<tr><td class="k">Uitrollen mislukt met een melding over Microsoft.ManagedServices</td><td>De resourceprovider is niet geregistreerd</td><td>Bij de klant: Abonnement → Resourceproviders → Microsoft.ManagedServices → Registreren, dan opnieuw</td></tr>
+<tr><td class="k">Klant niet zichtbaar na aanzetten</td><td>Oud aanmeldtoken, of het filter staat verkeerd</td><td>Stap D2: opnieuw aanmelden en het abonnementenfilter nalopen; anders 10 minuten wachten</td></tr>
+<tr><td class="k">Groep niet te vinden bij "Groepen detecteren"</td><td>Je hebt niet de juiste rol, of de groep is net gemaakt</td><td>Aanmelden als Privileged Role Administrator; even wachten en opnieuw zoeken</td></tr>
+<tr><td class="k">"Activeren" ontbreekt bij Mijn rollen → Groepen</td><td>Geen P2-licentie, of niet toegevoegd in stap A4</td><td>Licentie toekennen; stap A4 nalopen</td></tr>
+<tr><td class="k">Na aanzetten wel zichtbaar, maar acties worden geweigerd</td><td>De rol dekt de actie niet (bijvoorbeeld rechten uitdelen, of data lezen)</td><td>Dat kan niet met Contributor via Lighthouse; per klant apart oplossen</td></tr>
+<tr><td class="k">Er staan twee koppelingen bij de klant</td><td>Uitgerold met een andere mspOfferName</td><td>De overbodige weghalen; voortaan dezelfde naam gebruiken</td></tr>
+</tbody></table></div>
+
+<div class="let">
+<p><b>Wat nog niet zeker is.</b></p>
+<ul>
+<li>De hele procedure is nog niet in een echte tenant uitgevoerd. De namen van knoppen en menu's zijn vertaald uit de Engelse documentatie en kunnen in de portal net anders heten.</li>
+<li>Hoe snel toegang ingaat en stopt, weten we pas na de test.</li>
+<li>Over goedkeuring per groep is één melding gevonden dat de instelling niet altijd wordt afgedwongen. Wil je goedkeuring gebruiken, test dat dan apart.</li>
+</ul>
+</div>
+
+<h2 id="bronnen">Bronnen (Microsoft)</h2>
+<ul>
+<li><a href="https://learn.microsoft.com/en-us/azure/lighthouse/how-to/onboard-customer">Onboard a customer to Azure Lighthouse</a></li>
+<li><a href="https://github.com/Azure/Azure-Lighthouse-samples/tree/master/templates/delegated-resource-management/subscription">Azure-Lighthouse-samples — sjabloon voor een abonnement</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/lighthouse/how-to/update-delegation">Update a delegation</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/lighthouse/how-to/remove-delegation">Remove access to a delegation</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/lighthouse/how-to/view-manage-customers">View and manage customers and delegated resources</a></li>
+<li><a href="https://learn.microsoft.com/en-us/azure/lighthouse/concepts/tenants-users-roles">Tenants, users, and roles in Azure Lighthouse scenarios</a></li>
+<li><a href="https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/concept-pim-for-groups">PIM for Groups</a></li>
+<li><a href="https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/groups-role-settings">Configure PIM for Groups settings</a></li>
+<li><a href="https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/groups-assign-member-owner">Assign eligibility for a group in PIM</a></li>
+<li><a href="https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/groups-activate-roles">Activate your group membership in PIM</a></li>
+<li><a href="https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/groups-concept">Use Microsoft Entra groups to manage role assignments</a></li>
+</ul>
+
+<footer>Bijgehouden door Buddy · 10 november 2026</footer>
+</div>
+</body>
+</html>

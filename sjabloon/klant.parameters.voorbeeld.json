@@ -1,0 +1,29 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "mspOfferName": {
+            "value": "Softtech beheer - KLANTNAAM"
+        },
+        "mspOfferDescription": {
+            "value": "Azure-beheer door Softtech met persoonlijke accounts en tijdelijke toegang"
+        },
+        "managedByTenantId": {
+            "value": "VUL-IN-TENANT-ID-SOFTTECH"
+        },
+        "authorizations": {
+            "value": [
+                {
+                    "principalId": "VUL-IN-OBJECT-ID-VAN-DE-KLANTGROEP",
+                    "principalIdDisplayName": "LH-KLANTNAAM-Beheer",
+                    "roleDefinitionId": "b24988ac-6180-42a0-ab88-20f7382dd24c"
+                },
+                {
+                    "principalId": "VUL-IN-OBJECT-ID-VAN-DE-KLANTGROEP",
+                    "principalIdDisplayName": "LH-KLANTNAAM-Beheer",
+                    "roleDefinitionId": "91c1777a-f3dc-4fae-b103-61d183457e46"
+                }
+            ]
+        }
+    }
+}
